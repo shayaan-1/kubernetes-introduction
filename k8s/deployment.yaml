@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-lab-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-lab
+  template:
+    metadata:
+      labels:
+        app: kube-lab
+    spec:
+      containers:
+        - name: kube-lab-container
+          image: kube-lab-app:v1
+          ports:
+            - containerPort: 8080
+
+          # --- add these probes ---
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 3
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
